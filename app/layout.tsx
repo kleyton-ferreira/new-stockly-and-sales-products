@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./_components/sidebar";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,6 +26,16 @@ export default function RootLayout({
           <Sidebar />
           {children}
         </div>
+        <Toaster
+          theme="light"
+          richColors
+          position="bottom-right"
+          style={
+            {
+              "--sonner-color": "hsl(var(--textColor-primary))",
+            } as React.CSSProperties
+          }
+        />
       </body>
     </html>
   );

@@ -33,6 +33,7 @@ import {
   CreatedProductSchema,
   createdProductSchema,
 } from "@/app/_actions/product/schema";
+import { toast } from "sonner";
 
 const AddProductButton = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
@@ -50,8 +51,10 @@ const AddProductButton = () => {
     try {
       await createdProduct(data);
       setDialogIsOpen(false);
+      toast.success("Produto criado com sucesso.");
     } catch (error) {
       console.log(error);
+      toast.error("Erro ao criar produto.");
     }
   };
 
@@ -156,6 +159,7 @@ const AddProductButton = () => {
                   disabled={forms.formState.isSubmitting}
                   variant="destructive"
                   type="submit"
+                  className="w-[30%]"
                 >
                   {forms.formState.isSubmitting && (
                     <Loader2Icon size={16} className="animate-spin" />
