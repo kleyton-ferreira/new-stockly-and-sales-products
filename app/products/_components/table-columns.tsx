@@ -5,6 +5,7 @@ import { Product } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { CircleIcon } from "lucide-react";
 import TableDropdown from "./table-dropdown";
+import { formatBRL } from "@/app/_lib/format";
 
 const getStatusLabel = (product: Product) => {
   if (product.stock === 0) {
@@ -31,6 +32,7 @@ export const productTablecolumns: ColumnDef<Product>[] = [
         <h3>Valor unitário</h3>
       </div>
     ),
+    cell: (row) => formatBRL(Number(row.row.original.price)),
   },
   {
     accessorKey: "stock",
