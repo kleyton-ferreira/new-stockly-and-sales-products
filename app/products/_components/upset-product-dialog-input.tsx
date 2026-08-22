@@ -1,7 +1,6 @@
 "use client";
 
 import { toast } from "sonner";
-
 import { Loader2Icon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/app/_components/ui/input";
@@ -33,24 +32,30 @@ import {
 } from "@/app/_components/ui/dialog";
 import { Button } from "@/app/_components/ui/button";
 
-interface UpsetProductDialogProps {
-  onSucess: () => void;
+interface UpsetProductDialogInputProps {
+  defaultValues?: CreatedProductSchema;
+  onSucess?: () => void;
 }
 
-const UpsetProductDialog = ({ onSucess }: UpsetProductDialogProps) => {
+const UpsetProductDialogInput = ({
+  onSucess,
+  defaultValues,
+}: UpsetProductDialogInputProps) => {
   const forms = useForm({
     resolver: zodResolver(createdProductSchema),
-    defaultValues: {
+    defaultValues: defaultValues ?? {
       name: "",
       price: 0,
       stock: 1,
     },
   });
 
+  const isEditing = !!defaultValues;
+
   const handleOnsubmit = async (data: CreatedProductSchema) => {
     try {
-      await createdProduct(data);
-      onSucess();
+      await createdProduct({ ...data, id: defaultValues?.id });
+      onSucess?.();
       toast.success("Produto criado com sucesso.");
     } catch (error) {
       console.log(error);
@@ -64,7 +69,7 @@ const UpsetProductDialog = ({ onSucess }: UpsetProductDialogProps) => {
         <form onSubmit={forms.handleSubmit(handleOnsubmit)}>
           <DialogHeader>
             <DialogTitle className="font-semibold text-textColor-primary">
-              Criar Produto
+              {isEditing ? "Editar" : "Criar"} Produto
             </DialogTitle>
             <DialogDescription>Informações do produto abaixo</DialogDescription>
           </DialogHeader>
@@ -166,4 +171,6 @@ const UpsetProductDialog = ({ onSucess }: UpsetProductDialogProps) => {
   );
 };
 
-export default UpsetProductDialog;
+export default UpsetProductDialogInput;
+
+// ESSE CARA E MEU INPUT..
