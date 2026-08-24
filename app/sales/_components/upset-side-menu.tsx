@@ -146,7 +146,7 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
       {/* ESSE COMPONENTE E O COMPONENTE QUE TEM O TABLE */}
       <UpsetTable
         selectedProducts={selectedProducts}
-        setSelectedProducts={setSelectedProducts}
+        setSelectedProduct={setSelectedProducts}
       />
     </SheetContent>
   );

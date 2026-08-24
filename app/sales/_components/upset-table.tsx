@@ -13,7 +13,6 @@ import {
 import { formatBRL } from "@/app/_lib/format";
 import { useMemo } from "react";
 import TableDropdownMenu from "./table-dropdown-menu";
-import { toast } from "sonner";
 
 interface SelectedProduct {
   id: string;
@@ -24,7 +23,7 @@ interface SelectedProduct {
 
 interface UpsetTableProps {
   selectedProducts: SelectedProduct[];
-  setSelectedProducts: (products: SelectedProduct[]) => void;
+  setSelectedProduct: (products: SelectedProduct[]) => void;
 }
 
 interface UpsetTableProps {
@@ -33,22 +32,20 @@ interface UpsetTableProps {
 
 const UpsetTable = ({
   selectedProducts,
-  setSelectedProducts,
+  setSelectedProduct,
 }: UpsetTableProps) => {
+  const handleDeleteProduct = (productId: string) => {
+    const updatedProductsDelete = selectedProducts.filter(
+      (product) => product.id !== productId,
+    );
+    setSelectedProduct(updatedProductsDelete);
+  };
+
   const productTotal = useMemo(() => {
     return selectedProducts.reduce((acc, prodValue) => {
       return acc + prodValue.price * prodValue.quantity;
     }, 0);
   }, [selectedProducts]);
-
-  const handleDeleteProduct = (productId: string) => {
-    const updatedProductsDelete = selectedProducts.filter(
-      (product) => product.id !== productId,
-    );
-    toast.success("produto deletado com sucesso");
-    setSelectedProducts(updatedProductsDelete);
-  };
-
   return (
     <Table>
       <TableCaption>A lista de produtos adicionado à venda.</TableCaption>
