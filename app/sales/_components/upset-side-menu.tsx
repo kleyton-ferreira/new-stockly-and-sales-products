@@ -91,7 +91,7 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
   };
 
   return (
-    <SheetContent className="!max-w-[600px]">
+    <SheetContent className="!max-w-[736px]">
       <SheetHeader className="mb-5">
         <SheetTitle className="text-textColor-primary">Nova venda</SheetTitle>
         <SheetDescription>
@@ -144,7 +144,10 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
       </Form>
 
       {/* ESSE COMPONENTE E O COMPONENTE QUE TEM O TABLE */}
-      <UpsetTable selectedProducts={selectedProducts} />
+      <UpsetTable
+        selectedProducts={selectedProducts}
+        setSelectedProducts={setSelectedProducts}
+      />
     </SheetContent>
   );
 };
