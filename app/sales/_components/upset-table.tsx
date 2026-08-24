@@ -12,6 +12,8 @@ import {
 } from "@/app/_components/ui/table";
 import { formatBRL } from "@/app/_lib/format";
 import { useMemo } from "react";
+import TableDropdownMenu from "./table-dropdown-menu";
+import { toast } from "sonner";
 
 interface SelectedProduct {
   id: string;
@@ -22,27 +24,41 @@ interface SelectedProduct {
 
 interface UpsetTableProps {
   selectedProducts: SelectedProduct[];
+  setSelectedProducts: (products: SelectedProduct[]) => void;
 }
 
 interface UpsetTableProps {
   selectedProducts: SelectedProduct[];
 }
 
-const UpsetTable = ({ selectedProducts }: UpsetTableProps) => {
+const UpsetTable = ({
+  selectedProducts,
+  setSelectedProducts,
+}: UpsetTableProps) => {
   const productTotal = useMemo(() => {
     return selectedProducts.reduce((acc, prodValue) => {
       return acc + prodValue.price * prodValue.quantity;
     }, 0);
   }, [selectedProducts]);
+
+  const handleDeleteProduct = (productId: string) => {
+    const updatedProductsDelete = selectedProducts.filter(
+      (product) => product.id !== productId,
+    );
+    toast.success("produto deletado com sucesso");
+    setSelectedProducts(updatedProductsDelete);
+  };
+
   return (
     <Table>
-      <TableCaption>A lista de produtos a venda.</TableCaption>
+      <TableCaption>A lista de produtos adicionado à venda.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Produto</TableHead>
           <TableHead>Preço Unitário</TableHead>
           <TableHead>Quantidade</TableHead>
           <TableHead>Total</TableHead>
+          <TableHead>Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -53,6 +69,13 @@ const UpsetTable = ({ selectedProducts }: UpsetTableProps) => {
             <TableCell> {productItens.quantity} </TableCell>
             <TableCell>
               {formatBRL(productItens.price * productItens.quantity)}
+            </TableCell>
+            <TableCell>
+              {/* COMPONENTE IMPORTADO.. PARA DELEÇAO DOS PRODUTOS DE VENDA.. ESSA FUNÇAO EU TENHO O setSelectedProducts E ELE ESTA NO COMPONENTE PAI - Upset-side-menu E LA EU APENAS PASSO O   setSelectedProducts={setSelectedProducts} SO PRA PEGAR O STATE */}
+              <TableDropdownMenu
+                product={productItens}
+                onDelete={() => handleDeleteProduct(productItens.id)}
+              />
             </TableCell>
           </TableRow>
         ))}
