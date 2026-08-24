@@ -13,6 +13,7 @@ import {
 import { formatBRL } from "@/app/_lib/format";
 import { useMemo } from "react";
 import TableDropdownMenu from "./table-dropdown-menu";
+import { toast } from "sonner";
 
 interface SelectedProduct {
   id: string;
@@ -38,6 +39,7 @@ const UpsetTable = ({
     const updatedProductsDelete = selectedProducts.filter(
       (product) => product.id !== productId,
     );
+    toast.success("Produto deletado com sucesso.");
     setSelectedProduct(updatedProductsDelete);
   };
 

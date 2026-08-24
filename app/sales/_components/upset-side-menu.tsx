@@ -67,7 +67,17 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
       const existingProduct = currentProducts.find(
         (product) => product.id === selectedProduct.id,
       );
+
       if (existingProduct) {
+        const productIsOuOfStock =
+          existingProduct.quantity + data.quantity > selectedProduct.stock;
+        if (productIsOuOfStock) {
+          forms.setError("quantity", {
+            message: "Quantidade indisponível em estoque.",
+          });
+          return currentProducts;
+        }
+        forms.reset();
         return currentProducts.map((prod) => {
           if (prod.id === selectedProduct.id) {
             return {
@@ -78,6 +88,15 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
           return prod;
         });
       }
+
+      const productIsOuOfStock = data.quantity > selectedProduct.stock;
+      if (productIsOuOfStock) {
+        forms.setError("quantity", {
+          message: "Quantidade indisponível em estoque.",
+        });
+        return currentProducts;
+      }
+      forms.reset();
       return [
         ...currentProducts,
         {
@@ -87,7 +106,6 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
         },
       ];
     });
-    forms.reset();
   };
 
   return (
