@@ -34,7 +34,7 @@ const SalesPage = async () => {
             </Button>
           </SheetTrigger>
           {/* AQUI VERIA O SheetContent - QUE ESTA NO COMPONENTE FILHO. UpsetSideMenu - CRIEI UM COMPONENTE SEPARADO */}
-          <UpsetSideMenu productOptions={productionsOptionValues} />
+          <UpsetSideMenu productOptions={productionsOptionValues} products={product} />
         </Sheet>
       </div>
     </div>

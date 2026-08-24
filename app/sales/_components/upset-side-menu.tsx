@@ -1,6 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import { Button } from "@/app/_components/ui/button";
 import { Combobox, ComboboxOption } from "@/app/_components/ui/combobox";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Product } from "@prisma/client";
+
+import { useForm } from "react-hook-form";
+import z from "zod";
+import UpsetTable from "./upset-table";
 import {
   Form,
   FormField,
@@ -15,22 +23,34 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import z from "zod";
 
 const formSchema = z.object({
-  productId: z.string().uuid(),
-  quantity: z.number().int().positive(),
+  productId: z.string().min(1, "O produto é obrigatório.").uuid(),
+  quantity: z.coerce
+    .number({ required_error: "A quantidade é obrigátoria." })
+    .int("A quantidade deve ser número inteiro.")
+    .positive("Aquantidade deve ser maior que zero."),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
 
 interface UpsetSideMenuProps {
+  products: Product[];
   productOptions: ComboboxOption[];
 }
 
-const UpsetSideMenu = ({ productOptions }: UpsetSideMenuProps) => {
+interface selectedProductsProps {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
+  const [selectedProducts, setSelectedProducts] = useState<
+    selectedProductsProps[]
+  >([]);
+
   const forms = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,8 +59,39 @@ const UpsetSideMenu = ({ productOptions }: UpsetSideMenuProps) => {
     },
   });
 
+  const handleOnsubmit = (data: FormSchema) => {
+    const selectedProduct = products.find((prod) => prod.id === data.productId);
+    if (!selectedProduct) return;
+
+    setSelectedProducts((currentProducts) => {
+      const existingProduct = currentProducts.find(
+        (product) => product.id === selectedProduct.id,
+      );
+      if (existingProduct) {
+        return currentProducts.map((prod) => {
+          if (prod.id === selectedProduct.id) {
+            return {
+              ...prod,
+              quantity: prod.quantity + data.quantity,
+            };
+          }
+          return prod;
+        });
+      }
+      return [
+        ...currentProducts,
+        {
+          ...selectedProduct,
+          price: Number(selectedProduct.price),
+          quantity: data.quantity,
+        },
+      ];
+    });
+    forms.reset();
+  };
+
   return (
-    <SheetContent>
+    <SheetContent className="!max-w-[600px]">
       <SheetHeader className="mb-5">
         <SheetTitle className="text-textColor-primary">Nova venda</SheetTitle>
         <SheetDescription>
@@ -48,7 +99,7 @@ const UpsetSideMenu = ({ productOptions }: UpsetSideMenuProps) => {
         </SheetDescription>
       </SheetHeader>
       <Form {...forms}>
-        <form>
+        <form onSubmit={forms.handleSubmit(handleOnsubmit)}>
           <div className="space-y-4">
             <FormField
               control={forms.control}
@@ -58,8 +109,9 @@ const UpsetSideMenu = ({ productOptions }: UpsetSideMenuProps) => {
                   <FormLabel>Produto</FormLabel>
                   <Combobox
                     placeholder="Selecione o produto"
-                    {...field}
                     options={productOptions}
+                    onChange={field.onChange}
+                    value={field.value}
                   />
 
                   <FormMessage />
@@ -83,8 +135,16 @@ const UpsetSideMenu = ({ productOptions }: UpsetSideMenuProps) => {
               )}
             ></FormField>
           </div>
+          <div className="mt-8">
+            <Button className="w-full" variant="destructive">
+              Adicionar produto à venda
+            </Button>
+          </div>
         </form>
       </Form>
+
+      {/* ESSE COMPONENTE E O COMPONENTE QUE TEM O TABLE */}
+      <UpsetTable selectedProducts={selectedProducts} />
     </SheetContent>
   );
 };
