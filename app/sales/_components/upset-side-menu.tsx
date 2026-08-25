@@ -20,9 +20,12 @@ import { Input } from "@/app/_components/ui/input";
 import {
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/app/_components/ui/sheet";
+import { toast } from "sonner";
+import { CreateSale } from "@/app/_actions/sale/create-sale";
 
 const formSchema = z.object({
   productId: z.string().min(1, "O produto é obrigatório.").uuid(),
@@ -37,6 +40,7 @@ type FormSchema = z.infer<typeof formSchema>;
 interface UpsetSideMenuProps {
   products: Product[];
   productOptions: ComboboxOption[];
+  onSubmitSuccess: () => void;
 }
 
 interface selectedProductsProps {
@@ -46,7 +50,11 @@ interface selectedProductsProps {
   quantity: number;
 }
 
-const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
+const UpsetSideMenu = ({
+  productOptions,
+  products,
+  onSubmitSuccess,
+}: UpsetSideMenuProps) => {
   const [selectedProducts, setSelectedProducts] = useState<
     selectedProductsProps[]
   >([]);
@@ -108,6 +116,22 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
     });
   };
 
+  const handleCreateSales = async () => {
+    try {
+      await CreateSale({
+        products: selectedProducts.map((prod) => ({
+          id: prod.id,
+          quantity: prod.quantity,
+          price: prod.price,
+        })),
+      });
+      toast.success("Venda realizada com sucesso.");
+      onSubmitSuccess();
+    } catch (error) {
+      toast.error("Erro ao realizar uma venda.");
+    }
+  };
+
   return (
     <SheetContent className="!max-w-[736px]">
       <SheetHeader className="mb-5">
@@ -166,6 +190,17 @@ const UpsetSideMenu = ({ productOptions, products }: UpsetSideMenuProps) => {
         selectedProducts={selectedProducts}
         setSelectedProduct={setSelectedProducts}
       />
+
+      <SheetFooter className="mt-5">
+        <Button
+          variant="destructive"
+          className="w-full"
+          disabled={selectedProducts.length === 0}
+          onClick={handleCreateSales}
+        >
+          Finalizar venda
+        </Button>
+      </SheetFooter>
     </SheetContent>
   );
 };

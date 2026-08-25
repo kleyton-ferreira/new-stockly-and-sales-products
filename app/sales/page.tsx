@@ -1,9 +1,6 @@
-import { PlusIcon } from "lucide-react";
-import { Button } from "../_components/ui/button";
-import { Sheet, SheetTrigger } from "../_components/ui/sheet";
-import UpsetSideMenu from "./_components/upset-side-menu";
 import { getProducts } from "../_data-access/product/get-products";
 import { ComboboxOption } from "../_components/ui/combobox";
+import CreateSaleButton from "./_components/create-sale-button";
 
 const SalesPage = async () => {
   const product = await getProducts();
@@ -23,19 +20,12 @@ const SalesPage = async () => {
             Gestão de produtos
           </h3>
         </div>
-
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              variant="destructive"
-              className="text-base [&_svg]:size-auto"
-            >
-              <PlusIcon size={18} /> Nova venda
-            </Button>
-          </SheetTrigger>
-          {/* AQUI VERIA O SheetContent - QUE ESTA NO COMPONENTE FILHO. UpsetSideMenu - CRIEI UM COMPONENTE SEPARADO */}
-          <UpsetSideMenu productOptions={productionsOptionValues} products={product} />
-        </Sheet>
+         
+        {/* ESSE COMPONENTE FOI CRIADO PARA TER UMA INTERAÇAO E PRA FECHARMOS O SHEET QUANDO CRIAR A VENDA */}
+        <CreateSaleButton
+          products={product}
+          productOptions={productionsOptionValues}
+        />
       </div>
     </div>
   );
