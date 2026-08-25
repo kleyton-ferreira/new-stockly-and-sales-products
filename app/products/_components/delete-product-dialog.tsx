@@ -8,6 +8,7 @@ import {
   AlertDialogTitle,
 } from "@/app/_components/ui/alert-dialog";
 import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 interface DeleteProductDialogProps {
@@ -19,15 +20,14 @@ const DeleteProductDialog = ({
   productsName,
   productId,
 }: DeleteProductDialogProps) => {
-  const handleDeleteProduct = async () => {
-    try {
-      await deleteProduct({ id: productId });
+  const { execute: executeDeleteProduct } = useAction(deleteProduct, {
+    onSuccess: () => {
       toast.success("Produto excluído com sucesso.");
-    } catch (error) {
-      toast.error("Ocorreu um erro ao excluir um produto.");
-      console.log(error);
-    }
-  };
+    },
+    onError: () => {
+      toast.error("Ocorreu um erro ao excluir o produto.");
+    },
+  });
 
   return (
     <AlertDialogContent>
@@ -44,7 +44,7 @@ const DeleteProductDialog = ({
       <AlertDialogFooter className="gap-2">
         <AlertDialogCancel>Cancelar</AlertDialogCancel>
         <AlertDialogAction
-          onClick={handleDeleteProduct}
+          onClick={() => executeDeleteProduct({ id: productId })}
           className="bg-textColor-primary hover:bg-textColor-hover"
         >
           Continuar

@@ -2,10 +2,11 @@
 
 import { db } from "@/app/_lib/prisma"
 
-import { DeleteProductSchema, deleteProductSchema } from "./schema"
+import { deleteProductSchema } from "./schema"
 import { revalidatePath } from "next/cache"
+import { actionClient } from "@/app/_lib/safe-actions"
 
-export const deleteProduct = async ({ id }: DeleteProductSchema) => {
+export const deleteProduct = actionClient.schema(deleteProductSchema).action(async ({ parsedInput: { id } }) => {
     deleteProductSchema.parse({ id })
     await db.product.delete({
         where: {
@@ -13,4 +14,5 @@ export const deleteProduct = async ({ id }: DeleteProductSchema) => {
         }
     })
     revalidatePath("/products")
-} 
+})
+
