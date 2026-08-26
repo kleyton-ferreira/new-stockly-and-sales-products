@@ -20,11 +20,11 @@ const SalesPage = async () => {
             Gestão de produtos
           </h3>
         </div>
-         
+
         {/* ESSE COMPONENTE FOI CRIADO PARA TER UMA INTERAÇAO E PRA FECHARMOS O SHEET QUANDO CRIAR A VENDA */}
         <CreateSaleButton
-          products={product}
           productOptions={productionsOptionValues}
+          products={JSON.parse(JSON.stringify(product))}
         />
       </div>
     </div>
