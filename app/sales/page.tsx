@@ -1,9 +1,14 @@
 import { getProducts } from "../_data-access/product/get-products";
+import { getSales } from "../_data-access/sale/get-sales";
 import { ComboboxOption } from "../_components/ui/combobox";
 import CreateSaleButton from "./_components/create-sale-button";
+import { DataTable } from "../_components/ui/data-table";
+import { saleTableColmuns } from "./_components/table-columns";
 
 const SalesPage = async () => {
   const product = await getProducts();
+  const sales = await getSales();
+
   const productionsOptionValues: ComboboxOption[] = product.map((prod) => ({
     label: prod.name,
     value: prod.id,
@@ -27,6 +32,10 @@ const SalesPage = async () => {
           products={JSON.parse(JSON.stringify(product))}
         />
       </div>
+      <DataTable
+        columns={saleTableColmuns}
+        data={JSON.parse(JSON.stringify(sales))}
+      />
     </div>
   );
 };
