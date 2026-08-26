@@ -1,22 +1,22 @@
 "use client";
 
 import { Badge } from "@/app/_components/ui/badge";
-import { Product } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { CircleIcon } from "lucide-react";
 import TableDropdown from "./table-dropdown";
 import { formatBRL } from "@/app/_lib/format";
+import { ProductDto } from "@/app/_data-access/product/get-products";
 
-const getStatusLabel = (product: Product) => {
-  if (product.stock === 0) {
+const getStatusLabel = (status: string) => {
+  if (status === "OUT_OF_STOCK") {
     return "Fora de estoque";
   }
-  if (product.status === "IN_STOCK") {
+  if (status === "IN_STOCK") {
     return "Em estoque";
   }
 };
 
-export const productTablecolumns: ColumnDef<Product>[] = [
+export const productTablecolumns: ColumnDef<ProductDto>[] = [
   {
     accessorKey: "name",
     header: () => (
@@ -51,7 +51,7 @@ export const productTablecolumns: ColumnDef<Product>[] = [
     ),
     cell: (row) => {
       const product = row.row.original;
-      const label = getStatusLabel(product);
+      const label = getStatusLabel(product.status);
       return (
         <Badge
           variant={label === "Em estoque" ? "destructive" : "outline"}

@@ -9,14 +9,27 @@ import { MoreHorizontalIcon } from "lucide-react";
 export const saleTableColmuns: ColumnDef<SalesDto>[] = [
   {
     accessorKey: "productName",
-    header: "Produtos",
+    header: () => (
+      <div className="text-base font-semibold text-textColor-primary">
+        <h3>Produtos</h3>
+      </div>
+    ),
   },
   {
     accessorKey: "totalProducts",
-    header: "Quantidade de Produtos",
+    header: () => (
+      <div className="text-base font-semibold text-textColor-primary">
+        <h3>Quantidade de Produtos</h3>
+      </div>
+    ),
   },
   {
-    header: "Valor Total",
+    accessorKey: "totalAmount",
+    header: () => (
+      <div className="text-base font-semibold text-textColor-primary">
+        <h3>Valor Total</h3>
+      </div>
+    ),
     cell: ({
       row: {
         original: { totalAmount },
@@ -24,7 +37,12 @@ export const saleTableColmuns: ColumnDef<SalesDto>[] = [
     }) => formatBRL(totalAmount),
   },
   {
-    header: "Data",
+    accessorKey: "date",
+    header: () => (
+      <div className="text-base font-semibold text-textColor-primary">
+        <h3>Data</h3>
+      </div>
+    ),
     cell: ({
       row: {
         original: { date },
@@ -32,7 +50,12 @@ export const saleTableColmuns: ColumnDef<SalesDto>[] = [
     }) => new Date(date).toLocaleDateString("pt-BR"),
   },
   {
-    header: "Ações",
+    accessorKey: "action",
+    header: () => (
+      <div className="text-base font-semibold text-textColor-primary">
+        <h3>Ações</h3>
+      </div>
+    ),
     cell: () => (
       <Button variant="ghost">
         <MoreHorizontalIcon size={16} />

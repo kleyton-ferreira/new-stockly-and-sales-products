@@ -7,7 +7,6 @@ import { actionClient } from "@/app/_lib/safe-actions"
 
 export const createdProduct = actionClient.schema(createdProductSchema).action(async ({ parsedInput: { id, ...data } }) => {
     createdProductSchema.parse(data)
-    await new Promise((resolve) => setTimeout(resolve, 5000))
     await db.product.upsert({
         where: { id: id ?? "" },
         update: data,
