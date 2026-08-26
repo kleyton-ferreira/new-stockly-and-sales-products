@@ -2,15 +2,16 @@
 
 import { db } from "@/app/_lib/prisma"
 import { revalidatePath } from "next/cache"
-import { CreatedProductSchema, createdProductSchema } from "./schema"
+import { createdProductSchema } from "./schema"
+import { actionClient } from "@/app/_lib/safe-actions"
 
-export const createdProduct = async (data: CreatedProductSchema) => {
+export const createdProduct = actionClient.schema(createdProductSchema).action(async ({ parsedInput: { id, ...data } }) => {
     createdProductSchema.parse(data)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 5000))
     await db.product.upsert({
-        where: { id: data.id ?? "" },
+        where: { id: id ?? "" },
         update: data,
         create: data
     })
     revalidatePath("/products")
-}
+})

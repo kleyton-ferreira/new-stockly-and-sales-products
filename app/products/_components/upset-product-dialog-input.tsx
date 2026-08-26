@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/app/_components/ui/dialog";
 import { Button } from "@/app/_components/ui/button";
+import { useAction } from "next-safe-action/hooks";
 
 interface UpsetProductDialogInputProps {
   defaultValues?: CreatedProductSchema;
@@ -41,6 +42,16 @@ const UpsetProductDialogInput = ({
   onSucess,
   defaultValues,
 }: UpsetProductDialogInputProps) => {
+  const { execute: executeCreatedProducts } = useAction(createdProduct, {
+    onSuccess: () => {
+      toast.success("Produto salvo com sucesso.");
+      onSucess?.();
+    },
+    onError: () => {
+      toast.error("Ocorreu um erro ao salvar o produto.");
+    },
+  });
+
   const forms = useForm({
     resolver: zodResolver(createdProductSchema),
     defaultValues: defaultValues ?? {
@@ -52,21 +63,10 @@ const UpsetProductDialogInput = ({
 
   const isEditing = !!defaultValues;
 
-  const handleOnsubmit = async (data: CreatedProductSchema) => {
-    try {
-      await createdProduct({ ...data, id: defaultValues?.id });
-      onSucess?.();
-      toast.success("Produto criado com sucesso.");
-    } catch (error) {
-      console.log(error);
-      toast.error("Erro ao criar produto.");
-    }
-  };
-
   return (
     <DialogContent>
       <Form {...forms}>
-        <form onSubmit={forms.handleSubmit(handleOnsubmit)}>
+        <form onSubmit={forms.handleSubmit(executeCreatedProducts)}>
           <DialogHeader>
             <DialogTitle className="font-semibold text-textColor-primary">
               {isEditing ? "Editar" : "Criar"} Produto
@@ -153,10 +153,10 @@ const UpsetProductDialogInput = ({
                 </Button>
               </DialogClose>
               <Button
-                disabled={forms.formState.isSubmitting}
+                className="w-[30%]"
                 variant="destructive"
                 type="submit"
-                className="w-[30%]"
+                disabled={forms.formState.isSubmitting}
               >
                 {forms.formState.isSubmitting && (
                   <Loader2Icon size={16} className="animate-spin" />
