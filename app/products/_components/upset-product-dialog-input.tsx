@@ -42,15 +42,20 @@ const UpsetProductDialogInput = ({
   onSucess,
   defaultValues,
 }: UpsetProductDialogInputProps) => {
-  const { execute: executeCreatedProducts } = useAction(createdProduct, {
-    onSuccess: () => {
-      toast.success("Produto salvo com sucesso.");
-      onSucess?.();
+  const { execute: executeCreatedProducts, isPending } = useAction(
+    createdProduct,
+    {
+      onSuccess: () => {
+        toast.success("Produto salvo com sucesso.");
+        // Limpar o formulário após sucesso
+        forms.reset();
+        onSucess?.();
+      },
+      onError: () => {
+        toast.error("Ocorreu um erro ao salvar o produto.");
+      },
     },
-    onError: () => {
-      toast.error("Ocorreu um erro ao salvar o produto.");
-    },
-  });
+  );
 
   const forms = useForm({
     resolver: zodResolver(createdProductSchema),
@@ -85,6 +90,7 @@ const UpsetProductDialogInput = ({
                     <Input
                       placeholder="Digite o Produto"
                       error={!!forms.formState.errors.name}
+                      disabled={isPending}
                       {...field}
                     />
                   </FormControl>
@@ -110,6 +116,7 @@ const UpsetProductDialogInput = ({
                       fixedDecimalScale
                       placeholder="R$ 0,00"
                       error={!!forms.formState.errors.price}
+                      disabled={isPending}
                       value={field.value}
                       onValueChange={(values) => {
                         field.onChange(values.floatValue ?? 0);
@@ -134,6 +141,7 @@ const UpsetProductDialogInput = ({
                       type="number"
                       error={!!forms.formState.errors.stock}
                       placeholder="Digite o estoque do Produto"
+                      disabled={isPending}
                       {...field}
                       onChange={(e) => {
                         const value = e.target.valueAsNumber;
@@ -148,7 +156,7 @@ const UpsetProductDialogInput = ({
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="ghost" type="reset">
+                <Button variant="ghost" type="reset" disabled={isPending}>
                   Cancelar
                 </Button>
               </DialogClose>
@@ -156,12 +164,16 @@ const UpsetProductDialogInput = ({
                 className="w-[30%]"
                 variant="destructive"
                 type="submit"
-                disabled={forms.formState.isSubmitting}
+                disabled={isPending}
               >
-                {forms.formState.isSubmitting && (
-                  <Loader2Icon size={16} className="animate-spin" />
+                {isPending ? (
+                  <>
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    Finalizando...
+                  </>
+                ) : (
+                  "Salvar"
                 )}
-                Salvar
               </Button>
             </DialogFooter>
           </div>
@@ -172,5 +184,3 @@ const UpsetProductDialogInput = ({
 };
 
 export default UpsetProductDialogInput;
-
-// ESSE CARA E MEU INPUT..
