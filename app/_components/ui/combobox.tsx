@@ -35,7 +35,9 @@ export const Combobox = ({
 }: ComboboxProps) => {
   const [open, setOpen] = React.useState(false);
 
-  const selectedLabel = options.find((option) => option.value === value)?.label;
+  const selectedLabel = options?.find(
+    (option) => option.value === value,
+  )?.label;
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>

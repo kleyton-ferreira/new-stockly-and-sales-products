@@ -3,11 +3,18 @@
 import { SalesDto } from "@/app/_data-access/sale/get-sales";
 import { formatBRL } from "@/app/_lib/format";
 import { ColumnDef } from "@tanstack/react-table";
-import SaleDeopdownMenu from "./sale-dropdown-menu";
+import SaleDropdownMenu from "./sale-dropdown-menu";
+import { ProductDto } from "@/app/_data-access/product/get-products";
+import { ComboboxOption } from "@/app/_components/ui/combobox";
 
-export const saleTableColmuns: ColumnDef<SalesDto>[] = [
+interface saleTableColmunsProps extends SalesDto {
+  productsOne: ProductDto[];
+  prodOptions: ComboboxOption[];
+}
+
+export const saleTableColmuns: ColumnDef<saleTableColmunsProps>[] = [
   {
-    accessorKey: "productName",
+    accessorKey: "productNames",
     header: () => (
       <div className="text-base font-semibold text-textColor-primary">
         <h3>Produtos</h3>
@@ -55,6 +62,12 @@ export const saleTableColmuns: ColumnDef<SalesDto>[] = [
         <h3>Ações</h3>
       </div>
     ),
-    cell: ({ row: { original: sale } }) => <SaleDeopdownMenu sale={sale} />,
+    cell: ({ row: { original: sale } }) => (
+      <SaleDropdownMenu
+        sale={sale}
+        prodOptions={sale.prodOptions}
+        productsOne={sale.productsOne}
+      />
+    ),
   },
 ];

@@ -4,12 +4,12 @@ import { PlusIcon } from "lucide-react";
 import { Sheet, SheetTrigger } from "@/app/_components/ui/sheet";
 import { Button } from "@/app/_components/ui/button";
 import UpsetSideMenu from "./upset-side-menu";
-import { Product } from "@prisma/client";
 import { ComboboxOption } from "@/app/_components/ui/combobox";
 import { useState } from "react";
+import { ProductDto } from "@/app/_data-access/product/get-products";
 
 interface CreateSaleButtonProps {
-  products: Product[];
+  products: ProductDto[];
   productOptions: ComboboxOption[];
 }
 
@@ -31,6 +31,7 @@ const CreateSaleButton = ({
         productOptions={productOptions}
         products={products}
         onSubmitSuccess={() => setSheetIsOpen(false)}
+        onOpenChange={setSheetIsOpen}
       />
     </Sheet>
   );

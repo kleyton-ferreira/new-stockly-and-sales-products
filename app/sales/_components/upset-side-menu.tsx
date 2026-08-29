@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button } from "@/app/_components/ui/button";
 import { Combobox, ComboboxOption } from "@/app/_components/ui/combobox";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Product } from "@prisma/client";
 import { useAction } from "next-safe-action/hooks";
 
 import { useForm } from "react-hook-form";
@@ -28,6 +27,8 @@ import {
 import { toast } from "sonner";
 import { CreateSaleAction } from "@/app/_actions/sale/create-sale";
 import { flattenValidationErrors } from "next-safe-action";
+import { ProductDto } from "@/app/_data-access/product/get-products";
+import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
   productId: z.string().min(1, "O produto é obrigatório.").uuid(),
@@ -39,12 +40,6 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-interface UpsetSideMenuProps {
-  products: Product[];
-  productOptions: ComboboxOption[];
-  onSubmitSuccess: () => void;
-}
-
 interface selectedProductsProps {
   id: string;
   name: string;
@@ -52,27 +47,55 @@ interface selectedProductsProps {
   quantity: number;
 }
 
+interface UpsetSideMenuProps {
+  saleId?: string;
+  products: ProductDto[];
+  productOptions: ComboboxOption[];
+  onSubmitSuccess: () => void;
+  defaultSelectedProducts?: selectedProductsProps[];
+  onOpenChange?: (open: boolean) => void;
+}
+
 const UpsetSideMenu = ({
+  saleId,
   productOptions,
   products,
   onSubmitSuccess,
+  defaultSelectedProducts,
+  onOpenChange,
 }: UpsetSideMenuProps) => {
   const [selectedProducts, setSelectedProducts] = useState<
     selectedProductsProps[]
-  >([]);
+  >(defaultSelectedProducts ?? []);
 
-  // CRIEI ESSA FUNÇAO AQUI PRA VALIDAR OS ERRORS..
+  const { execute: executeCreateSale, isPending } = useAction(
+    CreateSaleAction,
+    {
+      onError: ({ error: { validationErrors, serverError } }) => {
+        const flattenedErrors = flattenValidationErrors(validationErrors);
+        toast.error(serverError ?? flattenedErrors.formErrors[0]);
+      },
+      onSuccess: () => {
+        // Verifica se tem saleId (significa que está editando)
+        if (saleId) {
+          toast.success("Venda atualizada com sucesso.");
+        } else {
+          toast.success("Venda realizada com sucesso.");
+        }
 
-  const { execute: executeCreateSale } = useAction(CreateSaleAction, {
-    onError: ({ error: { validationErrors, serverError } }) => {
-      const flattenedErrors = flattenValidationErrors(validationErrors);
-      toast.error(serverError ?? flattenedErrors.formErrors[0]);
+        setSelectedProducts([]);
+        forms.reset();
+
+        // Fechar o sheet - prioridade para onOpenChange
+        if (onOpenChange) {
+          onOpenChange(false);
+        }
+
+        // Chamar callback de sucesso
+        onSubmitSuccess();
+      },
     },
-    onSuccess: () => {
-      toast.success("Venda realizada com sucesso.");
-      onSubmitSuccess();
-    },
-  });
+  );
 
   const forms = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -132,9 +155,15 @@ const UpsetSideMenu = ({
     });
   };
 
-  // AQUELE ERRO EU VOU EXECUTAR ELE AQUI...
   const handleCreateSales = async () => {
+    // Validar se há produtos selecionados
+    if (selectedProducts.length === 0) {
+      toast.error("Adicione pelo menos um produto à venda.");
+      return;
+    }
+
     executeCreateSale({
+      id: saleId,
       products: selectedProducts.map((prod) => ({
         id: prod.id,
         quantity: prod.quantity,
@@ -146,7 +175,9 @@ const UpsetSideMenu = ({
   return (
     <SheetContent className="!max-w-[736px]">
       <SheetHeader className="mb-5">
-        <SheetTitle className="text-textColor-primary">Nova venda</SheetTitle>
+        <SheetTitle className="text-textColor-primary">
+          {saleId ? "Editar venda" : "Nova venda"}
+        </SheetTitle>
         <SheetDescription>
           Insira as Informações da venda abaixo.
         </SheetDescription>
@@ -189,7 +220,7 @@ const UpsetSideMenu = ({
             ></FormField>
           </div>
           <div className="mt-8">
-            <Button className="w-full" variant="destructive">
+            <Button className="w-full" variant="destructive" type="submit">
               Adicionar produto à venda
             </Button>
           </div>
@@ -206,10 +237,19 @@ const UpsetSideMenu = ({
         <Button
           variant="destructive"
           className="w-full"
-          disabled={selectedProducts.length === 0}
+          disabled={selectedProducts.length === 0 || isPending}
           onClick={handleCreateSales}
         >
-          Finalizar venda
+          {isPending ? (
+            <>
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              {saleId ? "Atualizando..." : "Finalizando..."}
+            </>
+          ) : saleId ? (
+            "Atualizar venda"
+          ) : (
+            "Finalizar venda"
+          )}
         </Button>
       </SheetFooter>
     </SheetContent>
@@ -217,5 +257,3 @@ const UpsetSideMenu = ({
 };
 
 export default UpsetSideMenu;
-
-// ESSE COMPONENTE E O COMPONENTE QUE ABRE O MENU LATERAL ELE TA SENDO IMPORTADO NO COMPONENTE PAI ( PAGE - SALES )

@@ -1,9 +1,11 @@
+"use client";
+
 import {
   AlertDialog,
   AlertDialogTrigger,
 } from "@/app/_components/ui/alert-dialog";
 import { Button } from "@/app/_components/ui/button";
-import { Dialog, DialogTrigger } from "@/app/_components/ui/dialog";
+import { Dialog } from "@/app/_components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +13,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/app/_components/ui/dropdown-menu";
-import { Sale } from "@prisma/client";
 
 import {
   MoreHorizontalIcon,
@@ -20,21 +21,35 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Sheet, SheetTrigger } from "@/app/_components/ui/sheet";
+import { useState } from "react";
+import UpsetSideMenu from "./upset-side-menu";
 import DeleteSalectDialog from "./delete-sale-dialog";
+import { ProductDto } from "@/app/_data-access/product/get-products";
+import { ComboboxOption } from "@/app/_components/ui/combobox";
+import { SalesDto } from "@/app/_data-access/sale/get-sales";
 
 interface SaleDeopdownMenuProps {
-  sale: Pick<Sale, "id">;
+  sale: Pick<SalesDto, "id" | "saleProduct">;
+  productsOne: ProductDto[];
+  prodOptions: ComboboxOption[];
 }
 
-const SaleDeopdownMenu = ({ sale }: SaleDeopdownMenuProps) => {
+const SaleDropdownMenu = ({
+  sale,
+  prodOptions,
+  productsOne,
+}: SaleDeopdownMenuProps) => {
+  const [upsertSheetIsOpen, setUpsertSheetIsOpen] = useState(false);
+
   const handleCopySale = () => {
     toast.success("Id copiado com sucesso.");
     return navigator.clipboard.writeText(sale.id);
   };
 
   return (
-    <AlertDialog>
-      <Dialog>
+    <Sheet open={upsertSheetIsOpen} onOpenChange={setUpsertSheetIsOpen}>
+      <AlertDialog>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost">
@@ -64,7 +79,7 @@ const SaleDeopdownMenu = ({ sale }: SaleDeopdownMenuProps) => {
               </div>
             </DropdownMenuItem>
 
-            <DialogTrigger asChild>
+            <SheetTrigger>
               <DropdownMenuItem className="group gap-1.5">
                 <div className="flex items-center gap-2">
                   <EditIcon
@@ -76,7 +91,7 @@ const SaleDeopdownMenu = ({ sale }: SaleDeopdownMenuProps) => {
                   </p>
                 </div>
               </DropdownMenuItem>
-            </DialogTrigger>
+            </SheetTrigger>
 
             <AlertDialogTrigger asChild>
               <DropdownMenuItem className="group gap-1.5">
@@ -95,9 +110,22 @@ const SaleDeopdownMenu = ({ sale }: SaleDeopdownMenuProps) => {
         </DropdownMenu>
 
         <DeleteSalectDialog salesId={sale.id} />
-      </Dialog>
-    </AlertDialog>
+        <UpsetSideMenu
+          saleId={sale.id}
+          productOptions={prodOptions || []}
+          products={productsOne || []}
+          onSubmitSuccess={() => setUpsertSheetIsOpen(false)}
+          onOpenChange={setUpsertSheetIsOpen}
+          defaultSelectedProducts={sale.saleProduct.map((slProducts) => ({
+            id: slProducts.productId,
+            quantity: slProducts.quantity,
+            price: Number(slProducts.unitPrice),
+            name: slProducts.productName,
+          }))}
+        />
+      </AlertDialog>
+    </Sheet>
   );
 };
 
-export default SaleDeopdownMenu;
+export default SaleDropdownMenu;

@@ -1,3 +1,5 @@
+"use client";
+
 import { deleteSale } from "@/app/_actions/sale/delete-sale";
 import {
   AlertDialogAction,
