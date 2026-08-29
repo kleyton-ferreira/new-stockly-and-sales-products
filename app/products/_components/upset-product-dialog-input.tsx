@@ -46,8 +46,12 @@ const UpsetProductDialogInput = ({
     createdProduct,
     {
       onSuccess: () => {
-        toast.success("Produto salvo com sucesso.");
-        // Limpar o formulário após sucesso
+        if (defaultValues) {
+          toast.success("Produto atualizado com sucesso.");
+        } else {
+          toast.success("Produto salvo com sucesso.");
+        }
+
         forms.reset();
         onSucess?.();
       },
