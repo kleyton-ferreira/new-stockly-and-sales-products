@@ -14,7 +14,7 @@ export const HeaderSubTitle = ({ children }: { children: ReactNode }) => {
 };
 
 export const HeaderLeft = ({ children }: { children: ReactNode }) => {
-  return <div className="space-y-1">{children}</div>;
+  return <div className="space-y-0">{children}</div>;
 };
 
 const Header = ({
