@@ -1,8 +1,17 @@
+import Header, {
+  HeaderLeft,
+  HeaderSubTitle,
+  HeaderTitle,
+} from "./_components/header";
+
 const HomePage = () => {
   return (
-    <div className="pt-8">
-      <h1>Home-page( "!" )</h1>
-    </div>
+    <Header>
+      <HeaderLeft>
+        <HeaderTitle>Visão geral dos dados</HeaderTitle>
+        <HeaderSubTitle>Dashboard</HeaderSubTitle>
+      </HeaderLeft>
+    </Header>
   );
 };
 
