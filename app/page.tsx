@@ -18,6 +18,7 @@ import Header, {
 import { getDashboard } from "./_data-access/dashboard/get-dashboard";
 import { formatBRL } from "./_lib/format";
 import RevenueChart from "./(dashboard)/revenue-chart";
+import MostSoldProductItem from "./(dashboard)/most-sold-product-item";
 
 const HomePage = async () => {
   const {
@@ -27,6 +28,7 @@ const HomePage = async () => {
     totalStock,
     totalProducts,
     totalLast14DaysRevenue,
+    mostSoldProducts,
   } = await getDashboard();
 
   return (
@@ -74,15 +76,24 @@ const HomePage = async () => {
         </SummaryCard>
       </div>
 
-      {/* Gráfico de Receita */}
-      <div className="flex flex-col overflow-hidden rounded-xl bg-white p-3 sm:p-4 md:p-6">
-        <p className="pt-2 text-base font-bold text-textColor-primary sm:pt-3 sm:text-lg">
-          Receita Total
-        </p>
-        <p className="text-xs text-textColor-secondary sm:text-sm">
-          Útimos 14 dias
-        </p>
-        <RevenueChart data={totalLast14DaysRevenue} />
+      <div className="grid min-h-0 grid-cols-[minmax(0,2.5fr),minmax(0,1fr)] gap-6">
+        <div className="flex flex-col overflow-hidden rounded-xl bg-white p-3 sm:p-4 md:p-6">
+          <p className="pt-2 text-base font-bold text-textColor-primary sm:pt-3 sm:text-lg">
+            Receita Total
+          </p>
+          <p className="text-xs text-textColor-secondary sm:text-sm">
+            Útimos 14 dias
+          </p>
+          <RevenueChart data={totalLast14DaysRevenue} />
+        </div>
+        <div className="space-y-6 overflow-auto pt-9">
+          <p className="font-semibold text-textColor-primary">
+            Produtos mais vendido
+          </p>
+          {mostSoldProducts.map((prodItem) => (
+            <MostSoldProductItem key={prodItem.productId} product={prodItem} />
+          ))}
+        </div>
       </div>
     </div>
   );
