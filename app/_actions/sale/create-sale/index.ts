@@ -95,4 +95,5 @@ export const CreateSaleAction = actionClient
 
         revalidatePath("/products")
         revalidatePath("/sales")
+        revalidatePath("/")
     })
