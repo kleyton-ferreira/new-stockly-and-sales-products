@@ -30,7 +30,7 @@ const HomePage = async () => {
   } = await getDashboard();
 
   return (
-    <div className="m-6 w-full space-y-8 rounded-lg">
+    <div className="m-3 w-full space-y-4 rounded-lg sm:m-4 sm:space-y-6 md:m-6 md:space-y-8">
       <Header>
         <HeaderLeft>
           <HeaderTitle>Visão geral dos dados</HeaderTitle>
@@ -38,7 +38,8 @@ const HomePage = async () => {
         </HeaderLeft>
       </Header>
 
-      <div className="grid grid-cols-2 gap-6">
+      {/* Grid 2 Colunas - Receita */}
+      <div className="grid grid-cols-1 gap-3 sm:w-full sm:grid-cols-2 sm:gap-4 md:gap-6">
         <SummaryCard>
           <SummaryCardIcon> {<DollarSign />} </SummaryCardIcon>
           <SummaryCardTitle>Receita total</SummaryCardTitle>
@@ -52,7 +53,8 @@ const HomePage = async () => {
         </SummaryCard>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      {/* Grid 3 Colunas - KPIs */}
+      <div className="grid grid-cols-1 gap-3 sm:w-full sm:grid-cols-2 sm:gap-4 md:gap-6 lg:grid-cols-3">
         <SummaryCard>
           <SummaryCardIcon> {<PackageIcon />} </SummaryCardIcon>
           <SummaryCardTitle>Vendas de hoje</SummaryCardTitle>
@@ -71,11 +73,15 @@ const HomePage = async () => {
           <SummaryCardValue> {totalProducts} </SummaryCardValue>
         </SummaryCard>
       </div>
-      <div className="flex flex-col overflow-hidden rounded-xl bg-white p-6">
-        <p className="pt-3 text-lg font-bold text-textColor-primary">
+
+      {/* Gráfico de Receita */}
+      <div className="flex flex-col overflow-hidden rounded-xl bg-white p-3 sm:p-4 md:p-6">
+        <p className="pt-2 text-base font-bold text-textColor-primary sm:pt-3 sm:text-lg">
           Receita Total
         </p>
-        <p className="text-sm text-textColor-secondary">Útimos 14 dias</p>
+        <p className="text-xs text-textColor-secondary sm:text-sm">
+          Útimos 14 dias
+        </p>
         <RevenueChart data={totalLast14DaysRevenue} />
       </div>
     </div>
