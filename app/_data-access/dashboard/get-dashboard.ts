@@ -1,4 +1,10 @@
 import { db } from "@/app/_lib/prisma"
+import dayjs from "dayjs"
+
+export interface DayTotalRevenue {
+    day: string
+    totalRevenue: number
+}
 
 interface DashboardDto {
     totalRevenue: number
@@ -6,9 +12,38 @@ interface DashboardDto {
     totalSales: number
     totalStock: number
     totalProducts: number
+    totalLast14DaysRevenue: DayTotalRevenue[]
 }
 
 export const getDashboard = async (): Promise<DashboardDto> => {
+
+    // Definindo o dia atual e os últimos 14 dias  : essa funçao e os graficos do dashboard
+    // Essa função calcula quanto de receita foi gerada em cada um dos últimos 14 dias. Vou quebrar tudo:
+    const today = dayjs().endOf("day").toDate()
+    // ARRAY de 14 dias
+    const last14Day = [13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((day) => {
+        return dayjs(today).subtract(day, "day")
+    })
+
+    // Array para armazenar a receita de cada dia 
+    const totalLast14DaysRevenue: DayTotalRevenue[] = []
+    for (const day of last14Day) {
+        const dayTotalRevenue = await db.$queryRawUnsafe<{ totalRevenue: number }[]>(
+            `
+        SELECT COALESCE(SUM("unitPrice" * "quantity"), 0) as "totalRevenue"
+        FROM "SaleProduct"
+        WHERE "createdAt" > $1 AND "createdAt" < $2
+        `,
+            day.startOf("day").toDate(),
+            day.endOf("day").toDate()
+        )
+
+        totalLast14DaysRevenue.push({
+            day: day.format("DD/MM"),
+            totalRevenue: dayTotalRevenue[0].totalRevenue
+        })
+    }
+
 
     // Total de Receita Definindo as Queries SQL para o Prisma
     const totalRevenueQuery = `
@@ -58,6 +93,7 @@ export const getDashboard = async (): Promise<DashboardDto> => {
         todayRevenue: Number(todayRevenue[0].todayRevenue),
         totalSales,
         totalStock: Number(totalStock._sum.stock),
-        totalProducts
+        totalProducts,
+        totalLast14DaysRevenue
     }
 }

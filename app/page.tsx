@@ -17,10 +17,17 @@ import Header, {
 
 import { getDashboard } from "./_data-access/dashboard/get-dashboard";
 import { formatBRL } from "./_lib/format";
+import RevenueChart from "./(dashboard)/revenue-chart";
 
 const HomePage = async () => {
-  const { todayRevenue, totalRevenue, totalSales, totalStock, totalProducts } =
-    await getDashboard();
+  const {
+    todayRevenue,
+    totalRevenue,
+    totalSales,
+    totalStock,
+    totalProducts,
+    totalLast14DaysRevenue,
+  } = await getDashboard();
 
   return (
     <div className="m-6 w-full space-y-8 rounded-lg">
@@ -63,6 +70,13 @@ const HomePage = async () => {
           <SummaryCardTitle>Produtos</SummaryCardTitle>
           <SummaryCardValue> {totalProducts} </SummaryCardValue>
         </SummaryCard>
+      </div>
+      <div className="flex flex-col overflow-hidden rounded-xl bg-white p-6">
+        <p className="pt-3 text-lg font-bold text-textColor-primary">
+          Receita Total
+        </p>
+        <p className="text-sm text-textColor-secondary">Útimos 14 dias</p>
+        <RevenueChart data={totalLast14DaysRevenue} />
       </div>
     </div>
   );
